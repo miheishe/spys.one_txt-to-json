@@ -1,16 +1,35 @@
-# This is a sample Python script.
+import json
+import requests
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+class Reader:
+    def __init__(self, link = "https://spys.me/proxy.txt", type = "http"):
+        self.link = link
+        self.type = type #can be http or socks
+        self.list = "Run get method first"
+
+    def get(self):
+        self.list = requests.get(self.link).text.split('\n')[6:] #not flexible, but simple
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+
+    # IP address:Port CountryCode-Anonymity(Noa/Anm/Hia)-SSL_support(S)-Google_passed(+)
+    # 118.70.12.171:53281 VN-H +
+    # 190.110.111.153:999 CL-N! -
+    # 95.0.219.234:8080 TR-N -
+    # 185.104.252.10:9090 LB-H -
+    # 95.66.142.11:8080 RU-N +
+    # 201.249.161.51:999 VE-A-S! -
+    # 191.97.9.189:999 CO-N! -
+    def get_list(self, country="all", anonymity="all", ssl="all", google_passed = "all"):
+        pass
+
+def run():
+    a = Reader()
+    a.get()
+    print(a.list)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+if __name__ == "__main__":
+    run()
+
