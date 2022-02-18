@@ -1,27 +1,49 @@
-import json
 import requests
 
+ANONYMITY_CASE = {'N': 'Not anonymous', 'A': 'Anonymous', 'H': 'High anonymous'}
+GOOGLE_PASS_CASE = {'+': True, '-': False}
+PROXY_TYPE_CASE = {'http':'https://spys.me/proxy.txt','socks':'https://spys.me/socks.txt'}
+
+
 class Reader:
-    def __init__(self, link = "https://spys.me/proxy.txt", type = "http"):
-        self.link = link
-        self.type = type #can be http or socks
+    def __init__(self, proxy_type="http"):
+        self.link = PROXY_TYPE_CASE[proxy_type]
+        self.proxy_type = proxy_type  # can be http or socks
         self.list = "Run get method first"
 
-    def get(self):
-        self.list = requests.get(self.link).text.split('\n')[6:] #not flexible, but simple
-
-
-
-    # IP address:Port CountryCode-Anonymity(Noa/Anm/Hia)-SSL_support(S)-Google_passed(+)
-    # 118.70.12.171:53281 VN-H +
-    # 190.110.111.153:999 CL-N! -
-    # 95.0.219.234:8080 TR-N -
-    # 185.104.252.10:9090 LB-H -
-    # 95.66.142.11:8080 RU-N +
-    # 201.249.161.51:999 VE-A-S! -
-    # 191.97.9.189:999 CO-N! -
-    def get_list(self, country="all", anonymity="all", ssl="all", google_passed = "all"):
+    def countryname(self, country_code):
+        # todo https://spys.one/en/proxy-by-country/
+        # return country
         pass
+
+    def get(self):
+        jsonlist = []
+        self.list = requests.get(self.link).text.split('\n')[6:-2]  # not flexible, but simple
+        for i in self.list:
+            data = i.rstrip().split(' ')
+            ip = data[0].split(':')[0]
+            port = data[0].split(':')[1]
+            google_pass = None if len(data) <= 2 else GOOGLE_PASS_CASE[data[-1]]
+            another_exit_ip = True if len(data[1].split('!')) > 1 else False
+            parameters = data[1].split('!')[0].split('-')
+            country = parameters[0]
+            anonymity = ANONYMITY_CASE[parameters[1]]
+            https = False if len(parameters) < 3 else True
+            jsonlist.append(
+                dict(ip=ip,
+                     port=port,
+                     https=https,
+                     another_exit_ip=another_exit_ip,
+                     country=country,
+                     anonymity=anonymity,
+                     google_pass=google_pass
+                     ))
+        self.list = jsonlist
+
+
+    def get_list(self, country="all", anonymity="all", ssl="all", google_passed="all"):
+        pass
+
 
 def run():
     a = Reader()
@@ -29,7 +51,5 @@ def run():
     print(a.list)
 
 
-
 if __name__ == "__main__":
     run()
-
