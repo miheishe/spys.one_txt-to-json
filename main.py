@@ -19,25 +19,17 @@ class Proxy:
     def check(self):
         result_before = requests.get('https://api.myip.com').json()['ip']
         proxy = {self.https: f'{self.ip}:{self.port}'}
-        # print("Proxy IP: ", proxy)
-        # print("IP before: ",result_before)
-
         try:
             result = requests.get('https://api.myip.com', proxies=proxy, timeout=5).json()['ip']
-            # print("IP after: ",result)
         except Exception:
             pass
-            # print("Proxy fail -- Can't connect")
         else:
             if (result_before != result):
                 self.check_pass = True
-                # print("Proxy OK")
-                return self
             else:
                 self.check_pass = False
-        #         print("Proxy Fail")
-        # finally:
-        #     print('---')
+        finally:
+            return self
 
 
 class Reader:
@@ -80,11 +72,10 @@ class Reader:
 
     def check_all(self):
         count = 0
-        self.working_proxies = []
+        self.checked_proxies = []
         for proxy in self.proxies_list:
             print(f'{count}/{len(self.proxies_list)}')
-            self.working_proxies.append(proxy.check())
-            # print(proxy.check_pass)
+            self.checked_proxies.append(proxy.check())
             count += 1
 
 
@@ -93,8 +84,8 @@ def run():
     a.get_all_proxies()
     a.check_all()
     print(a.working_proxies)
-    for i in a.working_proxies: # here we cath an exeption because method "check" return None if proxy doesn't work
-        print (i.https, i.ip, i.port)
+    for i in a.checked_proxies:
+        print (i.https, i.ip, i.port, i.check_pass)
     # a.proxies_list[0].check()
 
 
